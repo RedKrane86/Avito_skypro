@@ -42,6 +42,7 @@ class Category(models.Model):
     name = models.CharField(max_length=150)
 
     class Meta:
+        ordering = ["name"]
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
@@ -59,6 +60,7 @@ class Ad(models.Model):
     is_published = models.BooleanField(default=False)
 
     class Meta:
+        ordering = ["category"]
         verbose_name = "Объявление"
         verbose_name_plural = "Объявления"
 

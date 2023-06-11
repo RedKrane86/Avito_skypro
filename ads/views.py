@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, CreateView, ListView, DeleteView, UpdateView
 
+from HW_27 import settings
 from ads.models import Category, Ad, User
 
 
@@ -18,13 +19,31 @@ class CatListView(ListView):
 
     def get(self, request, *args, **kwargs):
         categories = Category.objects.all()
+
+        total_categories = self.orbject_list.count()
+        page = int(request.GET.get("page", 0))
+        offset = page * settings.TOTAL_ON_PAGE
+
+        if offset > total_categories:
+            self.object_list = []
+        elif offset:
+            self.object_list = self.object_list[offset:settings.TOTAL_ON_PAGE]
+        else:
+            self.object_list = self.object_list[:settings.TOTAL_ON_PAGE]
+
         result = []
         for cat in categories:
             result.append({
                     "id": cat.id,
                     "name": cat.name
                 })
-        return JsonResponse(result, safe=False)
+
+        response = {
+            "items": result,
+            "total": total_categories,
+            "per_page": settings.TOTAL_ON_PAGE
+        }
+        return JsonResponse(response, safe=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -93,6 +112,18 @@ class AdListView(ListView):
 
     def get(self, request, *args, **kwargs):
         ads = Ad.objects.all()
+        total_ads = self.object_list.count()
+
+        page = int(request.GET.get("page", 0))
+        offset = page * settings.TOTAL_ON_PAGE
+
+        if offset > total_ads:
+            self.object_list = []
+        elif offset:
+            self.object_list = self.object_list[offset:settings.TOTAL_ON_PAGE]
+        else:
+            self.object_list = self.object_list[:settings.TOTAL_ON_PAGE]
+
         result = []
         for ad in ads:
             result.append({
@@ -101,7 +132,13 @@ class AdListView(ListView):
                     "author": ad.author.username,
                     "price": ad.price
                 })
-        return JsonResponse(result, safe=False)
+
+        response = {
+            "items": result,
+            "total": total_ads,
+            "per_page": settings.TOTAL_ON_PAGE
+        }
+        return JsonResponse(response, safe=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -178,6 +215,7 @@ class AdUpdateView(UpdateView):
 @method_decorator(csrf_exempt, name='dispatch')
 class AdDeleteView(DeleteView):
     model = Ad
+    success_url = "/"
 
     def delete(self, request, *args, **kwargs):
         super().delete(request, *args, **kwargs)
