@@ -18,9 +18,11 @@ class CatListView(ListView):
     model = Category
 
     def get(self, request, *args, **kwargs):
+        super().get(request, *args, **kwargs)
+
         categories = Category.objects.all()
 
-        total_categories = self.orbject_list.count()
+        total_categories = self.object_list.count()
         page = int(request.GET.get("page", 0))
         offset = page * settings.TOTAL_ON_PAGE
 
@@ -111,9 +113,11 @@ class AdListView(ListView):
     model = Ad
 
     def get(self, request, *args, **kwargs):
-        ads = Ad.objects.all()
-        total_ads = self.object_list.count()
+        super().get(request, *args, **kwargs)
 
+        ads = Ad.objects.all()
+
+        total_ads = self.object_list.count()
         page = int(request.GET.get("page", 0))
         offset = page * settings.TOTAL_ON_PAGE
 
