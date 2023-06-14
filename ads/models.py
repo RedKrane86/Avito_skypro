@@ -31,6 +31,7 @@ class User(models.Model):
     location = models.ForeignKey("ads.Location", on_delete=models.DO_NOTHING)
 
     class Meta:
+        ordering = ["username"]
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
 
@@ -60,7 +61,7 @@ class Ad(models.Model):
     is_published = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ["category"]
+        ordering = ["price"]
         verbose_name = "Объявление"
         verbose_name_plural = "Объявления"
 

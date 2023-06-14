@@ -24,4 +24,5 @@ urlpatterns = [
     path('', root),
     path('ad/', include("ads.urls.ad")),
     path('cat/', include("ads.urls.cat")),
+    path('user/', include("ads.urls.user"))
 ]
