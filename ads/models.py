@@ -28,7 +28,7 @@ class User(models.Model):
     password = models.CharField(max_length=30)
     role = models.CharField(max_length=20, choices=UserRoles.choices, default=UserRoles.MEMBER)
     age = models.PositiveIntegerField()
-    location = models.ForeignKey("ads.Location", on_delete=models.DO_NOTHING)
+    location = models.ManyToManyField("Location")
 
     class Meta:
         ordering = ["username"]
@@ -61,7 +61,7 @@ class Ad(models.Model):
     is_published = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ["price"]
+        ordering = ["-price"]
         verbose_name = "Объявление"
         verbose_name_plural = "Объявления"
 

@@ -13,6 +13,10 @@ def csv_to_json(csv_f, json_f, model):
                     row["is_published"] = True
                 else:
                     row["is_published"] = False
+
+            if "location_id" in row:
+                row["location"] = [row["location_id"]]
+                del row["location_id"]
             result.append({'model': model, 'fields': row})
 
     with open(json_f, 'w', encoding='utf-8') as j_file:

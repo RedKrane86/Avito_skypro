@@ -1,5 +1,6 @@
 import json
 
+from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -87,7 +88,11 @@ class CatUpdateView(UpdateView):
         super().post(request, *args, **kwargs)
         data = json.loads(request.body)
 
-        self.object.name = data.pop("name")
+        if "name" in data:
+            self.object.name = data.pop("name")
+
+        self.object.save()
+
         cat = self.get_object()
 
         return JsonResponse({
@@ -115,7 +120,7 @@ class AdListView(ListView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
 
-        ads = Ad.objects.all()
+        ads = Ad.objects.select_related("author").all()
 
         total_ads = self.object_list.count()
         page = int(request.GET.get("page", 0))
@@ -197,10 +202,16 @@ class AdUpdateView(UpdateView):
         super().post(request, *args, **kwargs)
         data = json.loads(request.body)
 
-        self.object.name = data.pop("name")
-        self.object.price = data.pop("price")
-        self.object.description = data.pop("description")
-        self.object.category.name = data.pop("category")
+        if "name" in data:
+            self.object.name = data.pop("name")
+        if "price" in data:
+            self.object.price = data.pop("price")
+        if "description" in data:
+            self.object.description = data.pop("description")
+        if "category" in data:
+            self.object.category.name = data.pop("category")
+
+        self.object.save()
 
         ad = self.get_object()
 
@@ -235,7 +246,7 @@ class UserListView(ListView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
 
-        users = User.objects.all()
+        users = User.objects.annotate(total_ads=Count("ad", filter=Q(ad__is_published=True)))
 
         total_users = self.object_list.count()
         page = int(request.GET.get("page", 0))
@@ -257,7 +268,8 @@ class UserListView(ListView):
                 "last_name": user.last_name,
                 "role": user.role,
                 "age": user.age,
-                "locations": user.location.name
+                "locations": user.location.name,
+                "total_ads": user.total_ads
             })
 
         response = {
@@ -293,7 +305,7 @@ class UserCreateView(CreateView):
 
     def post(self, request, *args, **kwargs):
         user_data = json.loads(request.body)
-        location = get_object_or_404(Location, name=user_data.pop("location"))
+        location = Location.objects.get_or_create(name=user_data.pop("location"))
 
         new_user = User.objects.create(location=location, **user_data)
 
@@ -316,13 +328,20 @@ class UserUpdateView(UpdateView):
     def patch(self, request, *args, **kwargs):
         super().post(self, request, *args, **kwargs)
         data = json.loads(request.body)
+        if "username" in data:
+            self.object.username = data.pop("username")
+        if "password" in data:
+            self.object.password = data.pop("password")
+        if "first_name" in data:
+            self.object.first_name = data.pop("first_name")
+        if "last_name" in data:
+            self.object.last_name = data.pop("last_name")
+        if "age" in data:
+            self.object.age = data.pop("age")
+        if "locations" in data:
+            self.object.locations = data.pop("locations")
 
-        self.object.username = data.pop("username")
-        self.object.password = data.pop("password")
-        self.object.first_name = data.pop("first_name")
-        self.object.last_name = data.pop("last_name")
-        self.object.age = data.pop("age")
-        self.object.locations = data.pop("locations")
+        self.object.save()
 
         user = self.get_object()
 

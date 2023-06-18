@@ -9,7 +9,9 @@
             "password": "gZvptL",
             "role": "member",
             "age": "21",
-            "location": "1"
+            "location": [
+                "1"
+            ]
         }
     },
     {
@@ -22,7 +24,9 @@
             "password": "4fVqL2",
             "role": "moderator",
             "age": "24",
-            "location": "3"
+            "location": [
+                "3"
+            ]
         }
     },
     {
@@ -35,7 +39,9 @@
             "password": "o535pj",
             "role": "admin",
             "age": "29",
-            "location": "8"
+            "location": [
+                "8"
+            ]
         }
     },
     {
@@ -48,7 +54,9 @@
             "password": "d49rSO",
             "role": "moderator",
             "age": "19",
-            "location": "10"
+            "location": [
+                "10"
+            ]
         }
     },
     {
@@ -61,7 +69,9 @@
             "password": "wCqlVE",
             "role": "member",
             "age": "41",
-            "location": "2"
+            "location": [
+                "2"
+            ]
         }
     },
     {
@@ -74,7 +84,9 @@
             "password": "xuR2jf",
             "role": "member",
             "age": "37",
-            "location": "4"
+            "location": [
+                "4"
+            ]
         }
     },
     {
@@ -87,7 +99,9 @@
             "password": "gzP4vR",
             "role": "member",
             "age": "26",
-            "location": "7"
+            "location": [
+                "7"
+            ]
         }
     },
     {
@@ -100,7 +114,9 @@
             "password": "zo0rj6",
             "role": "member",
             "age": "24",
-            "location": "5"
+            "location": [
+                "5"
+            ]
         }
     },
     {
@@ -113,7 +129,9 @@
             "password": "daMocL",
             "role": "moderator",
             "age": "22",
-            "location": "9"
+            "location": [
+                "9"
+            ]
         }
     },
     {
@@ -126,7 +144,9 @@
             "password": "sasha123456",
             "role": "member",
             "age": "35",
-            "location": "6"
+            "location": [
+                "6"
+            ]
         }
     }
 ]
