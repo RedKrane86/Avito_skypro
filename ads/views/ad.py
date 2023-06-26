@@ -50,8 +50,8 @@ def root(request):
 #             "per_page": settings.TOTAL_ON_PAGE
 #         }
 #         return JsonResponse(response, safe=False)
-
-
+#
+#
 @method_decorator(csrf_exempt, name='dispatch')
 class AdCreateView(CreateView):
     model = Ad
@@ -74,27 +74,27 @@ class AdCreateView(CreateView):
             "is_published": new_ad.is_published
         })
 
-
-class AdDetailView(DetailView):
-    model = Ad
-
-    def get(self, request, *args, **kwargs):
-        try:
-            ad = self.get_object()
-        except Ad.DoesNotExist:
-            return JsonResponse({"error": "Not found"}, status=404)
-        return JsonResponse({
-            "id": ad.id,
-            "name": ad.name,
-            "author": ad.author.username,
-            "price": ad.price,
-            "description": ad.description,
-            "category": ad.category.name,
-            "image": ad.image.url if ad.image else None,
-            "is_published": ad.is_published
-        })
-
-
+#
+# class AdDetailView(DetailView):
+#     model = Ad
+#
+#     def get(self, request, *args, **kwargs):
+#         try:
+#             ad = self.get_object()
+#         except Ad.DoesNotExist:
+#             return JsonResponse({"error": "Not found"}, status=404)
+#         return JsonResponse({
+#             "id": ad.id,
+#             "name": ad.name,
+#             "author": ad.author.username,
+#             "price": ad.price,
+#             "description": ad.description,
+#             "category": ad.category.name,
+#             "image": ad.image.url if ad.image else None,
+#             "is_published": ad.is_published
+#         })
+#
+#
 @method_decorator(csrf_exempt, name='dispatch')
 class AdUpdateView(UpdateView):
     model = Ad
