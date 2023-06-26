@@ -1,8 +1,7 @@
 from rest_framework import routers
 
-from ads.views.ad import AdViewSet
-
+from ads.views.loc import LocationViewSet
 
 router = routers.SimpleRouter
-router.register("", AdViewSet)
+router.register("", LocationViewSet)
 urlpatterns = router.urls
