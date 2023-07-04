@@ -10,6 +10,6 @@ urlpatterns = [
     path('<int:pk>/delete/', AdDeleteView.as_view()),
 ]
 
-router = routers.SimpleRouter
+router = routers.SimpleRouter()
 router.register("", AdViewSet)
 urlpatterns += router.urls

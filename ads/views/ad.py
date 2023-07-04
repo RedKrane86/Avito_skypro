@@ -5,10 +5,12 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, CreateView, ListView, DeleteView, UpdateView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
 
 from HW_27 import settings
 from ads.models import Category, Ad, User
+from ads.permissions import IsOwner, IsStaff
 from ads.serialazers import AdSerializer, AdListSerializer, AdDetailSerializer
 
 
@@ -16,42 +18,6 @@ def root(request):
     return JsonResponse({"status": "ok"}, status=200)
 
 
-# class AdListView(ListView):
-#     model = Ad
-#
-#     def get(self, request, *args, **kwargs):
-#         super().get(request, *args, **kwargs)
-#
-#         ads = Ad.objects.select_related("author").all()
-#
-#         total_ads = self.object_list.count()
-#         page = int(request.GET.get("page", 0))
-#         offset = page * settings.TOTAL_ON_PAGE
-#
-#         if offset > total_ads:
-#             self.object_list = []
-#         elif offset:
-#             self.object_list = self.object_list[offset:settings.TOTAL_ON_PAGE]
-#         else:
-#             self.object_list = self.object_list[:settings.TOTAL_ON_PAGE]
-#
-#         result = []
-#         for ad in ads:
-#             result.append({
-#                     "id": ad.id,
-#                     "name": ad.name,
-#                     "author": ad.author.username,
-#                     "price": ad.price
-#                 })
-#
-#         response = {
-#             "items": result,
-#             "total": total_ads,
-#             "per_page": settings.TOTAL_ON_PAGE
-#         }
-#         return JsonResponse(response, safe=False)
-#
-#
 @method_decorator(csrf_exempt, name='dispatch')
 class AdCreateView(CreateView):
     model = Ad
@@ -74,27 +40,7 @@ class AdCreateView(CreateView):
             "is_published": new_ad.is_published
         })
 
-#
-# class AdDetailView(DetailView):
-#     model = Ad
-#
-#     def get(self, request, *args, **kwargs):
-#         try:
-#             ad = self.get_object()
-#         except Ad.DoesNotExist:
-#             return JsonResponse({"error": "Not found"}, status=404)
-#         return JsonResponse({
-#             "id": ad.id,
-#             "name": ad.name,
-#             "author": ad.author.username,
-#             "price": ad.price,
-#             "description": ad.description,
-#             "category": ad.category.name,
-#             "image": ad.image.url if ad.image else None,
-#             "is_published": ad.is_published
-#         })
-#
-#
+
 @method_decorator(csrf_exempt, name='dispatch')
 class AdUpdateView(UpdateView):
     model = Ad
@@ -143,12 +89,25 @@ class AdDeleteView(DeleteView):
 
 
 class AdViewSet(ModelViewSet):
-    queryset = Ad.objects.all()
+    queryset = Ad.objects.all().order_by('-price')
     serializers = {
         'list': AdListSerializer,
         'retrieve': AdDetailSerializer,
     }
     default_serializer = AdSerializer
+
+    permissions = {
+        'retrieve': [IsAuthenticated],
+        'create': [IsAuthenticated],
+        'update': [IsOwner | IsStaff],
+        'partial_update': [IsOwner | IsStaff],
+        'destroy': [IsOwner | IsStaff]
+    }
+    default_permission = [AllowAny]
+
+    def get_permissions(self):
+        self.permission_classes = self.permissions.get(self.action, self.default_permission)
+        return super().get_permissions()
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.default_serializer)

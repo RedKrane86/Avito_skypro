@@ -1,9 +1,9 @@
 import datetime
 
 from rest_framework import serializers
-from rest_framework.fields import SerializerMethodField
+from rest_framework.fields import IntegerField, SerializerMethodField
 from rest_framework.relations import SlugRelatedField
-from ads.models import User, Location, Ad, Category
+from ads.models import User, Location, Ad, Category, Selection
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):
-    total_ads = serializers.IntegerField()
+    total_ads = IntegerField()
 
     class Meta:
         model = User
@@ -21,7 +21,7 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
-    locations = SlugRelatedField(slug_field='name', many=True, queryset=Location.objects.all())
+    locations = SlugRelatedField(slug_field='name', many=True, queryset=Location.objects.all(), required=False)
 
     def is_valid(self, *, raise_exception=False):
         for loc_name in self.initial_data.get('location', []):
@@ -40,7 +40,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class UserAdSerializer(serializers.ModelSerializer):
-    locations = LocationSerializer(many=True)
+    location = LocationSerializer(many=True)
     age_of_born = SerializerMethodField()
 
     def get_age_of_born(self, obj):
@@ -48,7 +48,7 @@ class UserAdSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['locations', 'username', 'age_of_born']
+        fields = ['location', 'username', 'age_of_born']
 
 
 class AdSerializer(serializers.ModelSerializer):
@@ -66,9 +66,29 @@ class AdListSerializer(serializers.ModelSerializer):
 
 
 class AdDetailSerializer(serializers.ModelSerializer):
-    author = UserListSerializer()
+    author = UserAdSerializer()
     category = SlugRelatedField(slug_field='name', queryset=Category.objects.all())
 
     class Meta:
         model = Ad
         fields = '__all__'
+
+
+class SelectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Selection
+        fields = '__all__'
+
+
+class SelectionCreateSerializer(serializers.ModelSerializer):
+    owner = SlugRelatedField(slug_field='username', read_only=True)
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['owner'] = request.user
+        return super().create(validated_data)
+
+    class Meta:
+        model = Selection
+        fields = '__all__'
+

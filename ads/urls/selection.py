@@ -1,7 +1,7 @@
 from rest_framework import routers
 
-from ads.views.loc import LocationViewSet
+from ads.views.selection import SelectionViewSet
 
 router = routers.SimpleRouter()
-router.register("", LocationViewSet)
+router.register("", SelectionViewSet)
 urlpatterns = router.urls
