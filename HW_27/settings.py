@@ -148,3 +148,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'ads.User'
 
 TOTAL_ON_PAGE = 10
+
+MIN_AGE_REQUIRED = 9
+FORBIDDEN_DOMAIN = 'rambler.ru'

@@ -1,9 +1,10 @@
 import datetime
 
 from rest_framework import serializers
-from rest_framework.fields import IntegerField, SerializerMethodField
+from rest_framework.fields import IntegerField, SerializerMethodField, BooleanField
 from rest_framework.relations import SlugRelatedField
 from ads.models import User, Location, Ad, Category, Selection
+from ads.validators import check_not_published
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,14 +42,10 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class UserAdSerializer(serializers.ModelSerializer):
     location = LocationSerializer(many=True)
-    age_of_born = SerializerMethodField()
-
-    def get_age_of_born(self, obj):
-        return datetime.date.today().year - obj.age
 
     class Meta:
         model = User
-        fields = ['location', 'username', 'age_of_born']
+        fields = ['location', 'username']
 
 
 class AdSerializer(serializers.ModelSerializer):
@@ -59,15 +56,29 @@ class AdSerializer(serializers.ModelSerializer):
 
 class AdListSerializer(serializers.ModelSerializer):
     category = SlugRelatedField(slug_field='name', queryset=Category.objects.all())
+    user_locations = SerializerMethodField()
+
+    def get_user_locations(self, obj):
+        return [loc.name for loc in obj.author.location.all()]
 
     class Meta:
         model = Ad
-        fields = ['id', 'name', 'author', 'price', 'category']
+        fields = ['id', 'name', 'author', 'price', 'category', 'user_locations']
 
 
 class AdDetailSerializer(serializers.ModelSerializer):
     author = UserAdSerializer()
     category = SlugRelatedField(slug_field='name', queryset=Category.objects.all())
+
+    class Meta:
+        model = Ad
+        fields = '__all__'
+
+
+class AdCreateSerializer(serializers.ModelSerializer):
+    category = SlugRelatedField(slug_field='name', queryset=Category.objects.all())
+    author = SlugRelatedField(slug_field='username', queryset=User.objects.all())
+    is_published = BooleanField(validators=[check_not_published], required=False)
 
     class Meta:
         model = Ad
@@ -91,4 +102,11 @@ class SelectionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Selection
         fields = '__all__'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
 

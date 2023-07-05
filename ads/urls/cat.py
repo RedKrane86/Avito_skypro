@@ -1,12 +1,7 @@
-from django.urls import path
+from rest_framework import routers
 
-from ads.views.cat import CatListView, CatDetailView, CatCreateView, CatUpdateView, CatDeleteView
+from ads.views.cat import CategoryViewSet
 
-urlpatterns = [
-
-    path('', CatListView.as_view()),
-    path('<int:pk>/', CatDetailView.as_view()),
-    path('create/', CatCreateView.as_view()),
-    path('<int:pk>/update/', CatUpdateView.as_view()),
-    path('<int:pk>/delete/', CatDeleteView.as_view()),
-]
+router = routers.SimpleRouter()
+router.register("", CategoryViewSet)
+urlpatterns = router.urls

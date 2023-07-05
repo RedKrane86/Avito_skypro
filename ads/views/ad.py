@@ -11,34 +11,34 @@ from rest_framework.viewsets import ModelViewSet
 from HW_27 import settings
 from ads.models import Category, Ad, User
 from ads.permissions import IsOwner, IsStaff
-from ads.serialazers import AdSerializer, AdListSerializer, AdDetailSerializer
+from ads.serialazers import AdSerializer, AdListSerializer, AdDetailSerializer, AdCreateSerializer
 
 
 def root(request):
     return JsonResponse({"status": "ok"}, status=200)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class AdCreateView(CreateView):
-    model = Ad
-    fields = "__all__"
-
-    def post(self, request, *args, **kwargs):
-        ad_data = json.loads(request.body)
-        author = get_object_or_404(User, pk=ad_data.pop("author"))
-        category = get_object_or_404(Category, name=ad_data.pop("category"))
-
-        new_ad = Ad.objects.create(author=author, category=category, **ad_data)
-        return JsonResponse({
-            "id": new_ad.id,
-            "name": new_ad.name,
-            "author": new_ad.author.username,
-            "price": new_ad.price,
-            "description": new_ad.description,
-            "category": new_ad.category.name,
-            "image": new_ad.image.url if new_ad.image else None,
-            "is_published": new_ad.is_published
-        })
+# @method_decorator(csrf_exempt, name='dispatch')
+# class AdCreateView(CreateView):
+#     model = Ad
+#     fields = "__all__"
+#
+#     def post(self, request, *args, **kwargs):
+#         ad_data = json.loads(request.body)
+#         author = get_object_or_404(User, pk=ad_data.pop("author"))
+#         category = get_object_or_404(Category, name=ad_data.pop("category"))
+#
+#         new_ad = Ad.objects.create(author=author, category=category, **ad_data)
+#         return JsonResponse({
+#             "id": new_ad.id,
+#             "name": new_ad.name,
+#             "author": new_ad.author.username,
+#             "price": new_ad.price,
+#             "description": new_ad.description,
+#             "category": new_ad.category.name,
+#             "image": new_ad.image.url if new_ad.image else None,
+#             "is_published": new_ad.is_published
+#         })
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -93,6 +93,7 @@ class AdViewSet(ModelViewSet):
     serializers = {
         'list': AdListSerializer,
         'retrieve': AdDetailSerializer,
+        'create': AdCreateSerializer,
     }
     default_serializer = AdSerializer
 
